@@ -5,6 +5,8 @@ angular.module('ionic-audio').directive('ionAudioControls', function() {
     };
 
     function ionAudioControlsCtrl($scope, $element) {
+		$scope = !!$scope._track ? $scope : $scope.$parent;
+
 		var spinnerElem = $element.find('ion-spinner'), hasLoaded, self = this;
 
 		spinnerElem.addClass('ng-hide');
@@ -18,16 +20,10 @@ angular.module('ionic-audio').directive('ionAudioControls', function() {
 				self.toggleSpinner();
 			}
 
-			if (!!$scope.track.play) {
-				$scope.track.play();
-			} else if (!!$scope.$parent.track.play) {
-				$scope.$parent.track.play();
-			} else {
-				console.log('ionic-audio: track not found on scope or parent scope');
-			}
+			$scope._track.play();
 		};
 
-		var unbindStatusListener = $scope.$watch('track.status', function (status) {
+		var unbindStatusListener = $scope.$watch('_track.status', function (status) {
 			switch (status) {
 				case 1: // Media.MEDIA_STARTING
 					hasLoaded = false;

@@ -4,8 +4,8 @@ function ionAudioDuration() {
     return {
         restrict: 'E',
         scope: {
-            track: '='
+            _track: '=track'
         },
-        template: '{{track.duration | duration}}'
+        template: '{{_track.duration | duration}}'
     }
 }

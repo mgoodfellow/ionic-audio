@@ -4,8 +4,8 @@ function ionAudioProgress() {
     return {
         restrict: 'E',
         scope: {
-            track: '='
+            _track: '=track'
         },
-        template: '{{track.progress | time}}'
+        template: '{{_track.progress | time}}'
     }
 }

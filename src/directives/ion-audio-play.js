@@ -8,6 +8,8 @@ function ionAudioPlay($ionicGesture) {
     };
 
     function link(scope, element, attrs, controller) {
+		scope = !!scope._track ? scope : scope.$parent;
+
         var isLoading, debounce, currentStatus = 0;
 
         var init = function() {
@@ -45,7 +47,7 @@ function ionAudioPlay($ionicGesture) {
             debounce = true;
         }, element);
 
-        var unbindStatusListener = scope.$watch('track.status', function (status) {
+        var unbindStatusListener = scope.$watch('_track.status', function (status) {
             //  Media.MEDIA_NONE or Media.MEDIA_STOPPED
             if (status == 0 || status == 4) {
                 init();
