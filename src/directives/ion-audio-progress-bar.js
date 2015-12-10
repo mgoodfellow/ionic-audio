@@ -14,7 +14,9 @@ function ionAudioProgressBar(MediaManager) {
     };
 
     function link(scope, element, attrs) {
-		scope = !!scope._track ? scope : scope.$parent;
+		if (!scope._track && !!scope.$parent._track) {
+			scope._track = scope.$parent._track;
+		}
 
         var slider =  element.find('input'), unbindTrackListener;
 

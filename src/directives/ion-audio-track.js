@@ -14,7 +14,8 @@ function ionAudioTrack(MediaManager, $rootScope) {
     function ionAudioTrackCtrl($scope, $element) {
 		//$scope = !!$scope.track.play ? $scope : $scope.$parent;
 
-        var controller = this, hasOwnProgressBar = $element.find('ion-audio-progress-bar').length > 0;
+        var controller = this;
+		this.hasOwnProgressBar = $element.find('ion-audio-progress-bar').length > 0;
 
         var init = function() {
             $scope._track.progress = 0;

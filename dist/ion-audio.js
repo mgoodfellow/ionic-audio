@@ -252,7 +252,8 @@ function ionAudioTrack(MediaManager, $rootScope) {
     function ionAudioTrackCtrl($scope, $element) {
 		//$scope = !!$scope.track.play ? $scope : $scope.$parent;
 
-        var controller = this, hasOwnProgressBar = $element.find('ion-audio-progress-bar').length > 0;
+        var controller = this;
+		this.hasOwnProgressBar = $element.find('ion-audio-progress-bar').length > 0;
 
         var init = function() {
             $scope._track.progress = 0;
@@ -335,7 +336,9 @@ function ionAudioProgressBar(MediaManager) {
     };
 
     function link(scope, element, attrs) {
-		scope = !!scope._track ? scope : scope.$parent;
+		if (!scope._track && !!scope.$parent._track) {
+			scope._track = scope.$parent._track;
+		}
 
         var slider =  element.find('input'), unbindTrackListener;
 
