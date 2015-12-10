@@ -1,4 +1,4 @@
-angular.module('ionic-audio').factory('MediaManager', ['$interval', '$timeout', '$window', function ($interval, $timeout, $window) {
+angular.module('ionic-audio').factory('MediaManager', ['$q', '$interval', '$timeout', '$window', function ($q, $interval, $timeout, $window) {
     var tracks = [], currentTrack, currentMedia, playerTimer;
 
     if (!$window.cordova && !$window.Media) {
@@ -93,10 +93,14 @@ angular.module('ionic-audio').factory('MediaManager', ['$interval', '$timeout', 
 
         console.log('ionic-audio: playing track ' + currentTrack.title);
 
-        currentMedia = createMedia(currentTrack);
-        currentMedia.play();
+		createMedia(currentTrack).then(function (track) {
+			currentMedia = track;
+			currentMedia.play();
 
-        startTimer();
+			startTimer();
+		}, function (rejection) {
+			console.log('ionic-audio: failed to create media - ' + rejection);
+		});
     }
 
     function resume() {
@@ -113,15 +117,37 @@ angular.module('ionic-audio').factory('MediaManager', ['$interval', '$timeout', 
     }
 
     function createMedia(track) {
-        if (!track.url) {
-            console.log('ionic-audio: missing track url');
-            return undefined;
-        }
+		var deferred = $q.defer();
 
-        return new Media(track.url,
-            angular.bind(track, onSuccess),
-            angular.bind(track, onError),
-            angular.bind(track, onStatusChange));
+		if (!track.url) {
+			console.log('ionic-audio: missing track url');
+			deferred.reject('missing track url');
+		} else if (typeof(track.url) === 'function') {
+			track.url().then(function (url) {
+				track.url = url;
+
+				deferred.resolve(
+					new Media(url,
+						angular.bind(track, onSuccess),
+						angular.bind(track, onError),
+						angular.bind(track, onStatusChange))
+				);
+			}, function (rejection) {
+				deferred.reject(rejection);
+			});
+		} else if (typeof(track.url) === 'string') {
+			deferred.resolve(
+				new Media(track.url,
+					angular.bind(track, onSuccess),
+					angular.bind(track, onError),
+					angular.bind(track, onStatusChange))
+			);
+		} else {
+			console.log('ionic-audio: unrecognised track url type');
+			deferred.reject('missing track url');
+		}
+
+		return deferred.promise;
     }
 
     function releaseMedia() {
